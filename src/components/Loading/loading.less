@@ -1,0 +1,70 @@
+div.sino-loading {
+    margin: 0;
+    padding: 0;
+    z-index: -2;
+    background-color: rgb(229 230 232 / 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'montserrat', sans-serif;
+    div.sino-default-loading {
+      width: 200px;
+      height: 200px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border-top: 10px solid red;
+      position: relative;
+      animation: a1 1s linear infinite;
+    }
+  
+    div.sino-default-loading::before,
+    div.sino-default-loading::after {
+      content: '';
+      width: 200px;
+      height: 200px;
+      position: absolute;
+      left: 0;
+      top: -10px;
+      box-sizing: border-box;
+      border-radius: 50%;
+    }
+    div.sino-default-loading::before {
+      border-top: 10px solid #e67e22;
+      transform: rotate(120deg);
+    }
+    div.sino-default-loading::after {
+      border-top: 10px solid #3498db;
+      transform: rotate(240deg);
+    }
+  
+    div.sino-default-loading span {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      color: #333;
+      text-align: center;
+      line-height: 200px;
+      animation: a2 1s linear infinite;
+    }
+  
+    @keyframes a1 {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  
+    @keyframes a2 {
+      to {
+        transform: rotate(-360deg);
+      }
+    }
+  }
+  
+  div.sino-render {
+    height: calc(100vh - 100px);
+  }
+  
+  div.sino-load {
+    height: 100vh;
+  }
+  
