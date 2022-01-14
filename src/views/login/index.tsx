@@ -20,7 +20,6 @@ const Login: FC = (props: any) => {
       history.push('/')
     } else {
       removeToken()
-      history.push('/login')
     }
   }, [token, history])
 

@@ -2,7 +2,7 @@ import { request } from '@/utils/request'
 
 export const api = {
   login: '/admin/user/login',
-  getUserAll: '/admin/user/getUserAll'
+  loginUserAll: '/admin/user/getUserAll'
 }
 
 export function loginApi(data: any) {
@@ -13,9 +13,9 @@ export function loginApi(data: any) {
   })
 }
 
-export function getUserAllApi() {
+export function loginUserAllApi() {
   return request({
-    url: api.getUserAll,
+    url: api.loginUserAll,
     method: 'GET'
   })
 }

@@ -3,14 +3,12 @@ import { Layout } from 'antd'
 import Nav from './Sider/Nav'
 import './layout.less'
 import Hamburger from '@components/Hamburger'
-import { useHistory } from 'react-router-dom'
 
 const { Header, Content } = Layout
 
 const Main = () => {
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const history = useHistory()
 
   const handleResize = () => {
     document.documentElement.clientWidth < 768 ? setIsMobile(true) : setIsMobile(false)

@@ -1,4 +1,4 @@
 import { combineEpics } from 'redux-observable'
-import { loginEpic } from './login/loginEpic'
+import { loginEpic, loginUserAllEpic } from './login/loginEpic'
 
-export const rootEpic = combineEpics(loginEpic)
+export const rootEpic = combineEpics(loginEpic, loginUserAllEpic)
