@@ -1,11 +1,21 @@
-import React from 'react'
-import Main from '@/layout'
+import React, { Suspense } from 'react'
+import { Provider } from 'react-redux'
+import { ConfigProvider } from 'antd'
+import Loading from './components/Loading'
+import zhCN from 'antd/es/locale/zh_CN'
+import Routes from './routes'
+import store from './store'
+import '@assets/css/index.less'
 
 function App() {
   return (
-    <div className='App'>
-      <Main />
-    </div>
+    <Suspense fallback={<Loading hasSino={true} />}>
+      <ConfigProvider locale={zhCN}>
+        <Provider store={store}>
+          <Routes />
+        </Provider>
+      </ConfigProvider>
+    </Suspense>
   )
 }
 
