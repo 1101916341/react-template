@@ -43,7 +43,6 @@ function mapStateToProps(state: any) {
   return {
     token: state.loginReducer.token,
     menuList: state.loginReducer.menuList,
-    roles: state.loginReducer.roles
   }
 }
 

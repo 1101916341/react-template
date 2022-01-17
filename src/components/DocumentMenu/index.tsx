@@ -1,9 +1,19 @@
-import React, { Fragment } from 'react'
-import { Menu } from 'antd'
-import { Link } from 'react-router-dom'
-import { UserOutlined, VideoCameraOutlined, UploadOutlined } from '@ant-design/icons'
+import React, { Fragment, useState, useCallback } from 'react'
+import { Menu as MenuAntd } from 'antd'
+import { Link, withRouter } from 'react-router-dom'
+import { HomeOutlined } from '@ant-design/icons'
+import { connect } from 'react-redux'
 
 const DocumentMenu = (props: any) => {
+  const { menuList, history } = props
+  const [openKeys, setOpenKeys] = useState<Array<any>>([]) // 当前需要被展开的项
+  const { Item } = MenuAntd
+
+  // 菜单被选择
+  const onSelect = useCallback((e) => {
+    if (!e.key) e.key = '/dashboard'
+  }, [])
+
   return (
     <Fragment>
       <div className='sidebar-logo-container'>
@@ -16,19 +26,32 @@ const DocumentMenu = (props: any) => {
           )}
         </Link> */}
       </div>
-      <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']}>
-        <Menu.Item key='1' icon={<UserOutlined />}>
-          Index
-        </Menu.Item>
-        <Menu.Item key='2' icon={<VideoCameraOutlined />}>
-          Tables
-        </Menu.Item>
-        <Menu.Item key='3' icon={<UploadOutlined />}>
-          nav 3
-        </Menu.Item>
-      </Menu>
+      <MenuAntd
+        theme='dark'
+        mode='inline'
+        selectedKeys={history.location.pathname}
+        defaultOpenKeys={openKeys}
+        onSelect={onSelect}>
+        {menuList.map((item: any) => {
+          const { url, name, icon, id } = item
+          const icons = <img src={require(`@assets/images/${icon}`)} alt={icon} />
+          return (
+            <Item key={id} icon={icon ? icons : <HomeOutlined />}>
+              <Link to={url}>
+                <span>{name}</span>
+              </Link>
+            </Item>
+          )
+        })}
+      </MenuAntd>
     </Fragment>
   )
 }
 
-export default DocumentMenu
+function mapStateToProps(state: any) {
+  return {
+    menuList: state.loginReducer.menuList
+  }
+}
+
+export default connect(mapStateToProps, {})(withRouter(DocumentMenu))

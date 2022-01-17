@@ -39,7 +39,6 @@ export const loginUserAllEpic: Epic = (action$) =>
           if (response) {
             const { data } = response
             if (data && data.code === '200') {
-              console.log(data)
               return {
                 type: LOGIN_USER_ALL_FETCH_SUC,
                 payload: data

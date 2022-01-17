@@ -3,8 +3,9 @@ import { Layout } from 'antd'
 import Nav from './Sider/Nav'
 import './layout.less'
 import Hamburger from '@components/Hamburger'
+import LayoutContent from './Content'
 
-const { Header, Content } = Layout
+const { Header } = Layout
 
 const Main = () => {
   const [collapsed, setCollapsed] = useState(false)
@@ -26,16 +27,10 @@ const Main = () => {
     <Layout>
       <Nav collapsed={collapsed} isMobile={isMobile} changeCollapsed={(broken: any) => setCollapsed(broken)} />
       <Layout className='site-layout'>
-        <Header style={{ padding: 0, backgroundColor: '#ffffff' }}>
+        <Header style={{ padding: '0px 16px', backgroundColor: '#ffffff', }}>
           <Hamburger collapsed={collapsed} setCollapsed={setCollapsed} />
         </Header>
-        <Content
-          style={{
-            margin: '24px 16px',
-            padding: 24,
-            minHeight: 280,
-            backgroundColor: '#ffffff'
-          }}></Content>
+        <LayoutContent />
       </Layout>
     </Layout>
   )
