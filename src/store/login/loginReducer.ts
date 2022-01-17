@@ -1,4 +1,4 @@
-import { LOGIN_FETCH_SUC, LoginTypes, loginSucState, LOGIN_USER_ALL_FETCH_SUC } from './types'
+import { LOGIN_FETCH_SUC, LoginTypes, loginSucState, LOGIN_USER_ALL_FETCH_SUC, LOG_OUT_FETCH_SUC } from './types'
 import { getToken, setToken } from '@/utils/auth'
 
 const loginSucInit: loginSucState = {
@@ -8,7 +8,7 @@ const loginSucInit: loginSucState = {
 export const loginReducer = (state = loginSucInit, action: LoginTypes) => {
   switch (action.type) {
     case LOGIN_FETCH_SUC:
-      setToken(JSON.stringify(action.payload))
+      setToken(action.payload.token)
       return {
         ...state,
         token: action.payload.token
@@ -18,6 +18,13 @@ export const loginReducer = (state = loginSucInit, action: LoginTypes) => {
         ...state,
         menuList: action.payload.menuList,
         roles: action.payload.roles
+      }
+    case LOG_OUT_FETCH_SUC:
+      return {
+        ...state,
+        token: '',
+        menuList: '',
+        roles: ''
       }
     default:
       return state

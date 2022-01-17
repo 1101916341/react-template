@@ -4,11 +4,11 @@ const TokenKey = 'loginAuthToken'
 
 export function getToken() {
   const token: string | any = Cookies.get(TokenKey)
-  return token ? JSON.parse(token).token : ''
+  return token && token === '成功￥进入%' ? token : ''
 }
 
 export function setToken(token: any) {
-  return Cookies.set(TokenKey, token, { expires: 7 })
+  return Cookies.set(TokenKey, token, { expires: 3 })
 }
 
 export function removeToken() {

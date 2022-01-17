@@ -40,7 +40,11 @@ const Routes = React.memo((props: RouteTypes) => {
 })
 
 function mapStateToProps(state: any) {
-  return { token: state.loginReducer.token }
+  return {
+    token: state.loginReducer.token,
+    menuList: state.loginReducer.menuList,
+    roles: state.loginReducer.roles
+  }
 }
 
 export default connect(mapStateToProps, { loginUserAllAction })(Routes)

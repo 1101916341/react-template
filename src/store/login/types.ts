@@ -4,6 +4,9 @@ export const LOGIN_FETCH_SUC = 'LOGIN_FETCH_SUC'
 export const LOGIN_USER_ALL_FETCH = 'LOGIN_USER_ALL_FETCH'
 export const LOGIN_USER_ALL_FETCH_SUC = 'LOGIN_USER_ALL_FETCH_SUC'
 
+// 退出登录之后
+export const LOG_OUT_FETCH_SUC = 'LOG_OUT_FETCH_SUC'
+
 // State
 export interface loginState {
   username: string
@@ -31,4 +34,8 @@ export interface UserAllSucAction {
   payload: userAllState
 }
 
-export type LoginTypes = LoginSucAction | UserAllSucAction
+export interface LogOutSucAction {
+  type: typeof LOG_OUT_FETCH_SUC
+}
+
+export type LoginTypes = LoginSucAction | UserAllSucAction | LogOutSucAction

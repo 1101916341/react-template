@@ -5,23 +5,24 @@ import ReactCanvasNest from 'react-canvas-nest'
 import { Form, Input, Button } from 'antd'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
-import { loginAction } from '@store/login/loginAction'
+import { loginAction, logOutSucAction } from '@store/login/loginAction'
 import './login.less'
 import { useHistory } from 'react-router-dom'
 import { removeToken } from '@/utils/auth'
 
 const Login: FC = (props: any) => {
-  const { loginAction, token } = props
+  const { loginAction, token, logOutSucAction } = props
   const floatColor = token ? '110,65,255' : '24,144,255'
   const history = useHistory()
 
   useEffect(() => {
-    if (token && token === '成功￥进入%') {
+    if (token) {
       history.push('/')
     } else {
+      logOutSucAction()
       removeToken()
     }
-  }, [token, history])
+  }, [token, history, logOutSucAction])
 
   // 用户登录
   const onFinish = (value) => loginAction(value)
@@ -67,4 +68,4 @@ function mapStateToProps(state: any) {
     token: state.loginReducer.token
   }
 }
-export default connect(mapStateToProps, { loginAction })(Login)
+export default connect(mapStateToProps, { loginAction, logOutSucAction })(Login)
