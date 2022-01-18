@@ -3,7 +3,7 @@ import { Layout } from 'antd'
 import { connect } from 'react-redux'
 import DocumentTitle from '@components/DocumentTitle' // 浏览器title
 import { withRouter, Redirect, Route, Switch } from 'react-router-dom'
-import { routeMap, Error404, Error403 } from '@routes/config/routeMap' // 路由跳转
+import { routeMap, Error404, Error403 } from '@routes/config' // 路由跳转
 
 const { Content } = Layout
 
