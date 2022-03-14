@@ -1,3 +1,4 @@
+import { Card } from 'antd'
 import React from 'react'
 
 import { connect } from 'react-redux'
@@ -5,7 +6,11 @@ import { connect } from 'react-redux'
 const Dashboard = (props: any) => {
   const { history, taglist, deleteTag } = props
 
-  return <div>首页</div>
+  return (
+    <Card className='card' title='首页'>
+      首页
+    </Card>
+  )
 }
 function mapStateToProps(state: any) {
   return {

@@ -5,6 +5,32 @@ export function myTrim(x: string): string {
   return x ? x.replace(/^\s+|\s+$/gm, '') : ''
 }
 
+// string类型 去前后空格
+export function myTrimAllMethod(value: any) {
+  for (const i in value) {
+    if (value[i] && typeof value[i] === 'string') {
+      value[i] = myTrim(value[i])
+    }
+  }
+  return value
+}
+
+// 日期转换格式
+export function setTimeMethod(value, date: any) {
+  for (const key in date) {
+    if (date[key]) {
+      if (date[key] && date[key]._d) {
+        value[key] = dayjs(date[key]._d).format('YYYY-MM-DD')
+      } else if (date[key]) {
+        value[key] = date[key]
+      } else {
+        value[key] = ''
+      }
+    }
+  }
+  return value
+}
+
 // 下载功能
 export const handleFile = (url: string, name: string) => {
   const href = window.location.href
@@ -27,7 +53,7 @@ export const handleFile = (url: string, name: string) => {
  * @param {Object} obj  要拷贝的对象
  *
  */
-export const deepClose = (obj: any = {}) => {
+export const deepClone = (obj: any = {}) => {
   if (typeof obj !== 'object' || obj == null) {
     return obj
   }
@@ -39,7 +65,7 @@ export const deepClose = (obj: any = {}) => {
   }
   for (let key in obj) {
     if (obj.hasOwnProperty(key)) {
-      result[key] = deepClose(obj[key])
+      result[key] = deepClone(obj[key])
     }
   }
   return result

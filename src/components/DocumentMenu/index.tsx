@@ -1,13 +1,13 @@
 import React, { Fragment, useState, useCallback } from 'react'
 import { Menu as MenuAntd } from 'antd'
 import { Link, withRouter } from 'react-router-dom'
-import { HomeOutlined } from '@ant-design/icons'
+import { HomeOutlined, SettingOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 
 const DocumentMenu = (props: any) => {
   const { menuList, history } = props
   const [openKeys, setOpenKeys] = useState<Array<any>>([]) // 当前需要被展开的项
-  const { Item } = MenuAntd
+  const { Item, SubMenu } = MenuAntd
 
   // 菜单被选择
   const onSelect = useCallback((e) => {
@@ -33,14 +33,23 @@ const DocumentMenu = (props: any) => {
         defaultOpenKeys={openKeys}
         onSelect={onSelect}>
         {menuList.map((item: any) => {
-          const { url, name, icon, id } = item
+          const { url, name, icon, id, children } = item
           const icons = <img src={require(`@assets/images/${icon}`)} alt={icon} />
           return (
-            <Item key={id} icon={icon ? icons : <HomeOutlined />}>
-              <Link to={url}>
-                <span>{name}</span>
-              </Link>
-            </Item>
+            <Fragment key={id}>
+              {url ? (
+                <Item key={id} icon={icon ? icons : <HomeOutlined />}>
+                  <Link to={url}>
+                    <span>{name}</span>
+                  </Link>
+                </Item>
+              ) : (
+                <SubMenu key={id} icon={<SettingOutlined />} title={name}>
+                  <Item key='9'>Option 9</Item>
+                  <Item key='10'>Option 10</Item>
+                </SubMenu>
+              )}
+            </Fragment>
           )
         })}
       </MenuAntd>

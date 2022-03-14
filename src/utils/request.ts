@@ -1,9 +1,9 @@
 import axios from 'axios'
 import store from '../store'
 
-export const url: string = window.location.href.split('/#')[0]
+// export const url: string = window.location.href.split('/#')[0]
 
-axios.defaults.headers['Access-Control-Allow-Origin'] = process.env.NODE_ENV === 'development' ? url : url
+axios.defaults.headers['Access-Control-Allow-Origin'] = process.env.REACT_APP_API_URL
 axios.defaults.headers['Access-Control-Allow-Credentials'] = true
 axios.defaults.headers['x-requested-with'] = 'XMLHttpRequest'
 axios.defaults.headers['Content-Security-Policy'] = 'upgrade-insecure-requests'
@@ -15,7 +15,7 @@ const request = axios.create({
   headers: {
     'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS'
   },
-  baseURL: process.env.NODE_ENV === 'development' ? url : url,
+  baseURL: process.env.REACT_APP_API_URL,
   timeout: 200000
 })
 
