@@ -26,7 +26,7 @@ const Nav = ({ isMobile, collapsed, changeCollapsed, width = 256 }: NavTypes) =>
           style={{
             height: '100vh'
           }}>
-          <DocumentMenu />
+          <DocumentMenu collapsed={collapsed} />
         </Sider>
       ) : (
         <Drawer
@@ -46,7 +46,7 @@ const Nav = ({ isMobile, collapsed, changeCollapsed, width = 256 }: NavTypes) =>
             style={{
               height: '100vh'
             }}>
-            <DocumentMenu />
+            <DocumentMenu collapsed={collapsed} />
           </Sider>
         </Drawer>
       )}

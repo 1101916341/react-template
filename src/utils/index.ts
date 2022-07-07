@@ -1,4 +1,6 @@
 import dayjs from 'dayjs'
+import NotFound from '@views/error/404'
+import { routeMap } from '@routes/config'
 
 // 单个 去除首尾空格
 export function myTrim(x: string): string {
@@ -31,21 +33,39 @@ export function setTimeMethod(value, date: any) {
   return value
 }
 
-// 下载功能
-export const handleFile = (url: string, name: string) => {
-  const href = window.location.href
-  if (href.includes('localhost')) {
-    url = 'http://192.168.21.23:8082' + url
+/**
+ * 根据路径获取路由的name和key
+ * @param {string} path 路由
+ */
+export const getKeyName = (path: string = '/403') => {
+  const truePath = path.split('?')[0]
+  const curRoute = routeMap.filter((item: { path: string | string[] }) => item.path.includes(truePath))
+  if (curRoute[0]) {
+    const { name, key, component } = curRoute[0]
+    return { title: name, tabKey: key, component: component }
   } else {
-    url = href.split('/#').slice(0, 1).join('') + url
+    return { title: '暂无页面', tabKey: '404', component: NotFound }
   }
-  const link = document.createElement('a')
-  link.style.display = 'none' //使其隐藏
-  link.href = url //赋予文件下载地址
-  link.target = '_blank'
-  link.setAttribute('download', name) //设置下载属性 以及文件名
-  document.body.appendChild(link) //a标签插至页面中
-  link.click()
+}
+
+/**
+ * 获取本地存储中的权限
+ */
+export const getPermission = () => localStorage.getItem('permissions') || ''
+/**
+ * 根据权限判断是否有权限
+ */
+export const isAuthorized = (val: string): boolean => {
+  const permissions = getPermission()
+  return permissions.includes(val)
+}
+/**
+ * 处理用户信息并储存起来
+ */
+export const setUserInfo = (userInfo) => {
+  const { menuList } = userInfo
+  const permissionArray = menuList.filter((item) => item.code).map((val) => val.code)
+  localStorage.setItem('permissions', permissionArray)
 }
 
 /**

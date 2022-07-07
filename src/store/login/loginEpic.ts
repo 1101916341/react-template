@@ -13,12 +13,21 @@ export const loginEpic: Epic = (action$) =>
           if (response) {
             const { data } = response
             if (data && data.code === '200') {
-              message.success(data.message)
-              return {
-                type: LOGIN_FETCH_SUC,
-                payload: data
+              if (action.payload.userName === 'admin' && action.payload.password === '123456') {
+                message.success(data.message)
+                return {
+                  type: LOGIN_FETCH_SUC,
+                  payload: data
+                }
+              } else if (action.payload.userName !== 'admin') {
+                message.error('用户名不存在，请重新输入！')
+                return { type: null }
+              } else {
+                message.error('用户名或密码错误！')
+                return { type: null }
               }
             } else {
+              message.error('用户名或密码错误！')
               return { type: null }
             }
           } else {

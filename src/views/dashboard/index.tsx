@@ -1,6 +1,5 @@
-import { Card } from 'antd'
 import React from 'react'
-
+import { Card } from 'antd'
 import { connect } from 'react-redux'
 
 const Dashboard = (props: any) => {
@@ -9,6 +8,57 @@ const Dashboard = (props: any) => {
   return (
     <Card className='card' title='首页'>
       首页
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
+      <p>首页</p>
     </Card>
   )
 }

@@ -1,8 +1,6 @@
 import axios from 'axios'
 import store from '../store'
 
-// export const url: string = window.location.href.split('/#')[0]
-
 axios.defaults.headers['Access-Control-Allow-Origin'] = process.env.REACT_APP_API_URL
 axios.defaults.headers['Access-Control-Allow-Credentials'] = true
 axios.defaults.headers['x-requested-with'] = 'XMLHttpRequest'
@@ -26,7 +24,6 @@ request.interceptors.request.use(
     if (store.getState().loginReducer['token']) {
       // 让每个请求携带token-- ['Authorization']为自定义key 请根据实际情况自行修改
       // config.headers['Authorization'] = store.getState().loginReducer['token']
-      
       // 终止请求
       // cancelPending(config)
       // config.cancelToken = new cancelToken((fnc) => {

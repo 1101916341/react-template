@@ -9,11 +9,39 @@
     color: #2d2d2d;
   }
   .layout-content {
-    overflow: auto;
+    height: 100%;
+    div.ant-tabs-top {
+      height: 100%;
+    }
+  }
+  .tabs-content {
+    .ant-tabs-nav {
+      // position: fixed;
+      // z-index: 999;
+      height: 36px;
+      // width: calc(100% - 273px);
+      margin-bottom: 0;
+      background: #fff;
+    }
+    .ant-tabs-content-holder {
+      overflow: auto;
+      // height: 100%;
+      // margin-top: 36px;
+      // height: calc(100% - 100px);
+    }
   }
 }
 
 div.card {
   margin: 12px;
   border-radius: 5px;
+}
+
+.ant-layout-sider-dark {
+  .ant-layout-sider-children {
+    a .sidebar-logo-container {
+      box-shadow: none;
+      border-bottom: 1px solid #6f6a6a;
+    }
+  }
 }
