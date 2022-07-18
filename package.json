@@ -35,7 +35,8 @@
     "build": "craco --max_old_space_size=8192 build --progress",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "json-server": "json-server __json_server_mock__/db.json --watch"
+    "json-server": "json-server __json_server_mock__/db.json --watch",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -57,16 +58,34 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.7",
+    "@commitlint/cli": "12.1.4",
+    "@commitlint/config-conventional": "12.1.4",
     "@types/js-cookie": "^2.2.6",
     "@types/react-pdf": "^5.0.9",
     "@types/react-redux": "^7.1.21",
     "@types/react-router-dom": "^5.1.5",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
     "babel-plugin-import": "^1.13.3",
+    "cz-customizable": "6.3.0",
+    "eslint": "^7.27.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.18.3",
     "html-webpack-plugin": "4.5.2",
     "http-proxy-middleware": "^2.0.1",
+    "husky": "^6.0.0",
     "json-server": "^0.17.0",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.3.0",
     "redux-devtools-extension": "^2.13.9",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpackbar": "^5.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
   }
 }
