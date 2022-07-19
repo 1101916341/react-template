@@ -83,7 +83,7 @@ const LayoutContent = React.memo((props: any) => {
   const onEdit = (targetKey: string | any, action: string) => action === 'remove' && remove(targetKey)
 
   // 阻止右键默认事件
-  const handlePreventDefault = (e: Event | any, panel: object) => {
+  const handlePreventDefault = (e: Event | any, panel: unknown) => {
     e.preventDefault()
     setSelectedPanel(panel)
   }
@@ -174,4 +174,5 @@ function mapStateToProps(state: any) {
   }
 }
 
+LayoutContent.displayName = 'LayoutContent'
 export default connect(mapStateToProps, { tagAddFnc, tagDelFnc, tagUpdateFnc })(LayoutContent)

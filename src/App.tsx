@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import React, { Suspense } from 'react'
 import { Provider } from 'react-redux'
 import { ConfigProvider } from 'antd'
 import Loading from './components/Loading'

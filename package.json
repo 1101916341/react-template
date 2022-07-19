@@ -71,8 +71,12 @@
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.6.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.18.3",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "html-webpack-plugin": "4.5.2",
     "http-proxy-middleware": "^2.0.1",
     "husky": "^6.0.0",
@@ -87,5 +91,11 @@
     "commitizen": {
       "path": "node_modules/cz-customizable"
     }
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }

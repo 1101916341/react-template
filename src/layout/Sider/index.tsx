@@ -17,4 +17,5 @@ const LayoutSider = React.memo(() => {
   return <Nav collapsed={collapsed} isMobile={isMobile} changeCollapsed={(broken: any) => setCollapsed(broken)} />
 })
 
+LayoutSider.displayName='LayoutSider'
 export default LayoutSider

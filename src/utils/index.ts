@@ -83,7 +83,7 @@ export const deepClone = (obj: any = {}) => {
   } else {
     result = {}
   }
-  for (let key in obj) {
+  for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       result[key] = deepClone(obj[key])
     }

@@ -12,4 +12,6 @@ const Hamburger = React.memo((props: any) => {
   )
 })
 
+Hamburger.displayName = 'Hamburger'
+
 export default Hamburger
