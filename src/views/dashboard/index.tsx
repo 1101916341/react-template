@@ -6,7 +6,7 @@ const Dashboard = (props: any) => {
   const { history, taglist, deleteTag } = props
 
   return (
-    <Card className="card" title="首页">
+    <Card className='card' title='首页'>
       首页
       <p>首页</p>
       <p>首页</p>
