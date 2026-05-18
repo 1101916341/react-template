@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Layout } from 'antd'
 import Nav from './Sider/Nav'
-import './layout.less'
 import Hamburger from '@components/Hamburger'
 import LayoutContent from './Content'
 import { getKeyName, isAuthorized } from '@/utils'
 import { routeMap } from '@/routes/config'
+import './layout.less'
 
 const { Header, Content } = Layout
 
