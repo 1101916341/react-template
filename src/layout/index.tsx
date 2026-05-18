@@ -8,7 +8,7 @@ import LayoutContent from './Content'
 import { getKeyName, isAuthorized } from '@/utils'
 import { routeMap } from '@/routes/config'
 
-const { Header } = Layout
+const { Header, Content } = Layout
 
 const Main = (props: any) => {
   const [collapsed, setCollapsed] = useState(false)
@@ -97,9 +97,9 @@ const Main = (props: any) => {
         <Header>
           <Hamburger collapsed={collapsed} setCollapsed={setCollapsed} />
         </Header>
-        <Layout.Content>
+        <Content>
           <LayoutContent defaultActiveKey='dashboard' panesItem={panesItem} tabActiveKey={tabActiveKey} />
-        </Layout.Content>
+        </Content>
       </Layout>
     </Layout>
   )
