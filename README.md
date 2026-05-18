@@ -14,6 +14,17 @@ $ yarn install
 $ yarn start
 ```
 
+### 提交命令
+
+```bash
+$ git add .
+$ git commit -m '(fix|feat): 提交信息' 
+$ git push
+
+具体的commit信息，需要参考.cz-config.js文件
+```
+
+
 ## 接口
 
 ```
