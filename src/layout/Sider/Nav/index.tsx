@@ -35,7 +35,7 @@ const Nav = ({ isMobile, collapsed, changeCollapsed, width = 256 }: NavTypes) =>
           onClose={() => {
             changeCollapsed(!0)
           }}
-          visible={!collapsed}
+          open={!collapsed}
           closable={false}
           bodyStyle={{
             height: '100vh',

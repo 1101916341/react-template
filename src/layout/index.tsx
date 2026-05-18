@@ -60,7 +60,14 @@ const Main = (props: any) => {
     // 检查权限，比如直接从地址栏输入的，提示无权限
     const isHasAuth = checkAuth(pathname)
     if (!isHasAuth) {
-      const isPath = routeMap.filter((item: { path: string | string[] }) => item.path.includes(pathname.split('?')[0]))
+      const isPath = routeMap.filter((item: { path?: string | string[] }) => {
+        console.log(item.path, pathname)
+        if (item?.path && item.path.includes(pathname)) {
+          return item
+        } else {
+          return null
+        }
+      })
       const errorUrl: string = isPath.length > 0 ? '/403' : '/404'
       const { tabKey: errorKey, title: errorTitle, component: errorContent } = getKeyName(errorUrl)
       setPanesItem({

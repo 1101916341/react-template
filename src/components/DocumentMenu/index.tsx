@@ -4,6 +4,7 @@ import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import logo from '@assets/images/logo.png'
 import './DocumentMenu.less'
+import { routeMap } from '@/routes/config'
 
 interface DocumentMenuTypes {
   collapsed: boolean
@@ -25,10 +26,10 @@ const DocumentMenu: FC<any> = (props: DocumentMenuTypes) => {
     } else {
       kids = data.filter((item: any) => item.parentId === one.id)
     }
-    kids.forEach((item: { children: []; parentId: string; url: string }) =>
-      !item.parentId && !item.url
+    kids.forEach((item: { children: []; parentId: string; path: string }) =>
+      !item.parentId && !item.path
         ? (item.children = dataToJson(item, data))
-        : !item.url
+        : !item.path
         ? (item.children = dataToJson(item, data))
         : null
     )
@@ -38,23 +39,25 @@ const DocumentMenu: FC<any> = (props: DocumentMenuTypes) => {
   // 构建树结构
   const makeTreeDom = useCallback(
     (data: any[]): JSX.Element[] => {
-      return data.map((item: any) => {
-        const { url, name, icon, id, children } = item
-        const icons = <img src={require(`@assets/images/menu/${icon}`)} alt={icon} />
-        if (children) {
-          return (
-            <SubMenu key={url ? url : id} icon={icon ? icons : null} title={name}>
-              {makeTreeDom(children)}
-            </SubMenu>
-          )
-        } else {
-          return (
-            <Item key={url ? url : id} icon={icon ? icons : null}>
-              <Link to={url}>{name}</Link>
-            </Item>
-          )
-        }
-      })
+      return data
+        .filter((v) => v.isShow)
+        .map((item: any) => {
+          const { path, name, id, children } = item
+          // const icons = <img src={require(`@assets/images/menu/${icon}`)} alt={icon} />
+          if (children) {
+            return (
+              <SubMenu key={path ? path : id} title={name}>
+                {makeTreeDom(children)}
+              </SubMenu>
+            )
+          } else {
+            return (
+              <Item key={path ? path : id}>
+                <Link to={path}>{name}</Link>
+              </Item>
+            )
+          }
+        })
     },
     [SubMenu, Item]
   )
@@ -81,7 +84,7 @@ const DocumentMenu: FC<any> = (props: DocumentMenuTypes) => {
         )}
       </Link>
       <MenuAntd theme='dark' mode='inline' selectedKeys={[history.location.pathname]} defaultOpenKeys={openKeys}>
-        {treeDom}
+        {makeTreeDom(routeMap)} {/* 生成树结构的菜单项 */}
       </MenuAntd>
     </Fragment>
   )

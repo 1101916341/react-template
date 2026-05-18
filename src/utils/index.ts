@@ -39,7 +39,7 @@ export function setTimeMethod(value, date: any) {
  */
 export const getKeyName = (path: string = '/403') => {
   const truePath = path.split('?')[0]
-  const curRoute = routeMap.filter((item: { path: string | string[] }) => item.path.includes(truePath))
+  const curRoute = routeMap.filter((item: { path?: string | string[] }) => item.path && item.path.includes(truePath))
   if (curRoute[0]) {
     const { name, key, component } = curRoute[0]
     return { title: name, tabKey: key, component: component }
