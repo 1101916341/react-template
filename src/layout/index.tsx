@@ -5,7 +5,6 @@ import Nav from './Sider/Nav'
 import Hamburger from '@components/Hamburger'
 import LayoutContent from './Content'
 import { getKeyName, isAuthorized } from '@/utils'
-import { routeMap } from '@/routes/config'
 import './layout.less'
 
 const { Header, Content } = Layout
@@ -57,31 +56,31 @@ const Main = (props: any) => {
       return
     }
 
-    // 检查权限，比如直接从地址栏输入的，提示无权限
-    const isHasAuth = checkAuth(pathname)
-    if (!isHasAuth) {
-      const isPath = routeMap.filter((item: { path?: string | string[] }) => {
-        console.log(item.path, pathname)
-        if (item?.path && item.path.includes(pathname)) {
-          return item
-        } else {
-          return null
-        }
-      })
-      const errorUrl: string = isPath.length > 0 ? '/403' : '/404'
-      const { tabKey: errorKey, title: errorTitle, component: errorContent } = getKeyName(errorUrl)
-      setPanesItem({
-        title: errorTitle,
-        content: errorContent,
-        key: errorKey,
-        closable: true,
-        path: errorUrl
-      })
-      pathRef.current = errorUrl
-      setTabActiveKey(errorKey)
-      history.replace(errorUrl)
-      return
-    }
+    // // 检查权限，比如直接从地址栏输入的，提示无权限
+    // const isHasAuth = checkAuth(pathname)
+    // if (!isHasAuth) {
+    //   const isPath = routeMap.filter((item: { path?: string | string[] }) => {
+    //     console.log(item.path, pathname)
+    //     if (item?.path && item.path.includes(pathname)) {
+    //       return item
+    //     } else {
+    //       return null
+    //     }
+    //   })
+    //   const errorUrl: string = isPath.length > 0 ? '/403' : '/404'
+    //   const { tabKey: errorKey, title: errorTitle, component: errorContent } = getKeyName(errorUrl)
+    //   setPanesItem({
+    //     title: errorTitle,
+    //     content: errorContent,
+    //     key: errorKey,
+    //     closable: true,
+    //     path: errorUrl
+    //   })
+    //   pathRef.current = errorUrl
+    //   setTabActiveKey(errorKey)
+    //   history.replace(errorUrl)
+    //   return
+    // }
 
     // 记录新的路径，用于下次更新比较
     const newPath = search ? pathname + search : pathname

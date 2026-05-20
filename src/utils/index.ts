@@ -2,6 +2,18 @@ import dayjs from 'dayjs'
 import NotFound from '@views/error/404'
 import { routeMap } from '@routes/config'
 
+const flattenRouteMap = (routes: any[] = []) => {
+  return routes.reduce((result: any[], route: any) => {
+    if (route.path) {
+      result.push(route)
+    }
+    if (route.children && route.children.length > 0) {
+      result.push(...flattenRouteMap(route.children))
+    }
+    return result
+  }, [])
+}
+
 // 单个 去除首尾空格
 export function myTrim(x: string): string {
   return x ? x.replace(/^\s+|\s+$/gm, '') : ''
@@ -39,7 +51,8 @@ export function setTimeMethod(value, date: any) {
  */
 export const getKeyName = (path: string = '/403') => {
   const truePath = path.split('?')[0]
-  const curRoute = routeMap.filter((item: { path?: string | string[] }) => item.path && item.path.includes(truePath))
+  const flatRoutes = flattenRouteMap(routeMap)
+  const curRoute = flatRoutes.filter((item: { path?: string | string[] }) => item.path && item.path.includes(truePath))
   if (curRoute[0]) {
     const { name, key, component } = curRoute[0]
     return { title: name, tabKey: key, component: component }

@@ -17,46 +17,24 @@ const DocumentMenu: FC<any> = (props: DocumentMenuTypes) => {
   const [openKeys, setOpenKeys] = useState<Array<any>>([]) // 当前需要被展开的项
   const { Item, SubMenu } = MenuAntd
 
-  // 工具 - 递归将扁平数据转换为层级数据
-  const dataToJson = useCallback((one, data) => {
-    let kids
-    if (!one) {
-      // 第1次递归
-      kids = data.filter((item: any) => !item.parentId)
-    } else {
-      kids = data.filter((item: any) => item.parentId === one.id)
-    }
-    kids.forEach((item: { children: []; parentId: string; path: string }) =>
-      !item.parentId && !item.path
-        ? (item.children = dataToJson(item, data))
-        : !item.path
-        ? (item.children = dataToJson(item, data))
-        : null
-    )
-    return kids.length ? kids : []
-  }, [])
-
-  // 构建树结构
   const makeTreeDom = useCallback(
     (data: any[]): JSX.Element[] => {
       return data
         .filter((v) => v.isShow)
         .map((item: any) => {
           const { path, name, id, children } = item
-          // const icons = <img src={require(`@assets/images/menu/${icon}`)} alt={icon} />
-          if (children) {
+          if (children && children.length > 0) {
             return (
               <SubMenu key={path ? path : id} title={name}>
                 {makeTreeDom(children)}
               </SubMenu>
             )
-          } else {
-            return (
-              <Item key={path ? path : id}>
-                <Link to={path}>{name}</Link>
-              </Item>
-            )
           }
+          return (
+            <Item key={path ? path : id}>
+              <Link to={path}>{name}</Link>
+            </Item>
+          )
         })
     },
     [SubMenu, Item]
@@ -64,10 +42,9 @@ const DocumentMenu: FC<any> = (props: DocumentMenuTypes) => {
 
   /** 处理原始数据，将原始数据处理为层级关系 **/
   const treeDom: JSX.Element[] = useMemo(() => {
-    const sourceData: any[] = dataToJson(null, menuList) || []
-    const treeDom = makeTreeDom(sourceData)
-    return treeDom
-  }, [menuList, dataToJson, makeTreeDom])
+    const sourceData: any[] = routeMap || []
+    return makeTreeDom(sourceData)
+  }, [routeMap, makeTreeDom])
 
   return (
     <Fragment>
