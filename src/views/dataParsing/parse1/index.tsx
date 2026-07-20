@@ -1,62 +1,80 @@
 import React, { useState } from 'react'
-import { Button, Card, Form, Input, Table, Typography } from 'antd'
+import { Button, Card, Form, Input, InputNumber, Select, Table, Typography } from 'antd'
 import { connect } from 'react-redux'
 
 const { Title } = Typography
+const { TextArea } = Input
 
 interface DataRow {
   key: string
-  date: string
-  numberArray: number[]
+  id: number
+  status: string
+  response: string
 }
 
 const Parse1 = () => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
-  const [rows, setRows] = useState<DataRow[]>([
-    { key: '1', date: '2026-05-18', numberArray: [1, 2, 3] },
-    { key: '2', date: '2026-05-19', numberArray: [4, 5, 6] }
-  ])
+  const [rows, setRows] = useState<DataRow[]>([])
 
-  const handleSearch = async (values: { token: string; url: string; arrayData: string }) => {
-    const { token, url, arrayData } = values
-    const normalized = (arrayData || '').trim()
-    let parsedNumbers: number[] = []
-    if (normalized) {
-      try {
-        const json = JSON.parse(normalized)
-        if (Array.isArray(json)) {
-          parsedNumbers = json.map((item: any) => Number(item)).filter((item: any) => !Number.isNaN(item))
-        }
-      } catch (error) {
-        const parts = normalized
-          .replace(/\[|\]/g, '')
-          .split(/[,;\s]+/)
-          .filter(Boolean)
-        parsedNumbers = parts.map((item) => Number(item)).filter((item) => !Number.isNaN(item))
-      }
-    }
+  const handleSearch = async (values: {
+    apiUrl: string
+    headerT: string
+    headerCookie: string
+    initId: number
+    idMode: 'increment' | 'decrement'
+    loopCount: number
+  }) => {
+    const { apiUrl, headerT, headerCookie, initId, idMode, loopCount } = values
 
     setLoading(true)
-    try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-      }
-      if (token) {
-        headers['Authorization'] = `${token}`
-      }
+    setRows([])
 
-      const resp = await fetch(url, {
-        method: 'POST',
-        mode: 'cors',
-        credentials: 'include',
-        headers,
-        body: JSON.stringify({ array: parsedNumbers })
-      })
-      console.log('请求响应', resp)
-    } catch (error) {
-      console.error('请求异常', error)
+    const newRows: DataRow[] = []
+
+    try {
+      for (let i = 0; i < loopCount; i++) {
+        const currentId = idMode === 'increment' ? initId + i : initId - i
+        const id = currentId < 0 ? 0 : currentId
+
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json'
+        }
+        if (headerT) {
+          headers['_t_'] = headerT
+        }
+        if (headerCookie) {
+          headers['Cookie'] = headerCookie
+        }
+
+        try {
+          const resp = await fetch(apiUrl, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'include',
+            headers,
+            body: JSON.stringify({ id })
+          })
+          const text = await resp.text()
+          newRows.push({
+            key: String(i + 1),
+            id,
+            status: `${resp.status} ${resp.statusText}`,
+            response: text.length > 200 ? text.slice(0, 200) + '…' : text
+          })
+          console.log(`请求 #${i + 1} 响应`, resp)
+        } catch (error) {
+          newRows.push({
+            key: String(i + 1),
+            id,
+            status: '失败',
+            response: String(error)
+          })
+          console.error(`请求 #${i + 1} 异常`, error)
+        }
+      }
     } finally {
+      setRows(newRows)
       setLoading(false)
     }
   }
@@ -66,39 +84,64 @@ const Parse1 = () => {
       title: '序号',
       dataIndex: 'key',
       key: 'key',
+      width: 80
+    },
+    {
+      title: '请求 ID',
+      dataIndex: 'id',
+      key: 'id',
       width: 100
     },
     {
-      title: '日期',
-      dataIndex: 'date',
-      key: 'date'
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 140
     },
     {
-      title: '数字数组',
-      dataIndex: 'numberArray',
-      key: 'numberArray',
-      render: (value: number[]) => `[${value.join(', ')}]`
+      title: '响应数据',
+      dataIndex: 'response',
+      key: 'response',
+      ellipsis: true
     }
   ]
 
   return (
     <Card className='card'>
-      <Title level={4}>数据解析 - 搜索与表格</Title>
-      <Form form={form} layout='inline' style={{ marginBottom: 24 }} onFinish={handleSearch}>
-        <Form.Item label='Token' name='token'>
-          <Input placeholder='输入 token' style={{ width: 220 }} />
-        </Form.Item>
-        <Form.Item label='URL' name='url'>
-          <Input placeholder='输入 url' style={{ width: 260 }} />
-        </Form.Item>
-        <Form.Item label='数组数据' name='arrayData'>
-          <Input placeholder='例如 [1,2,3] 或 1,2,3' style={{ width: 280 }} />
-        </Form.Item>
-        <Form.Item>
-          <Button type='primary' htmlType='submit' loading={loading}>
-            搜索
-          </Button>
-        </Form.Item>
+      <Title level={4}>数据解析 - 接口循环调用</Title>
+      <Form
+        form={form}
+        style={{ marginBottom: 24 }}
+        onFinish={handleSearch}
+        initialValues={{ idMode: 'increment', loopCount: 1, initId: 1 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0 24px' }}>
+          <Form.Item label='接口地址' name='apiUrl' rules={[{ required: true, message: '请输入接口地址' }]}>
+            <Input placeholder='http/https 完整请求地址' />
+          </Form.Item>
+          <Form.Item label='请求头 _t_' name='headerT' rules={[{ required: true, message: '请输入 _t_ 字段值' }]}>
+            <Input placeholder='headers 的 _t_ 字段值' />
+          </Form.Item>
+          <Form.Item label='Cookie' name='headerCookie' rules={[{ required: true, message: '请输入 Cookie' }]}>
+            <Input placeholder='请求 headers 的 Cookie 字段值' />
+          </Form.Item>
+          <Form.Item label='初始 ID' name='initId' rules={[{ required: true, message: '请输入初始 ID 值' }]}>
+            <InputNumber placeholder='body 中 ID 的初始值' min={0} style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item label='ID 模式' name='idMode' rules={[{ required: true, message: '请选择 ID 变化模式' }]}>
+            <Select style={{ width: '100%' }}>
+              <Select.Option value='increment'>递增</Select.Option>
+              <Select.Option value='decrement'>递减</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item label='循环次数' name='loopCount' rules={[{ required: true, message: '请输入循环调用次数' }]}>
+            <InputNumber placeholder='调用接口的次数' min={1} style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item label=' ' colon={false}>
+            <Button type='primary' htmlType='submit' loading={loading} style={{ width: '100%' }}>
+              开始调用
+            </Button>
+          </Form.Item>
+        </div>
       </Form>
 
       <Table rowKey='key' columns={columns} dataSource={rows} pagination={false} />
