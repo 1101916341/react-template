@@ -37,6 +37,7 @@
     "test": "craco test",
     "eject": "react-scripts eject",
     "json-server": "json-server __json_server_mock__/db.json --watch",
+    "sample:gen": "ts-node --project tsconfig.scripts.json scripts/generateSampleData.ts",
     "prepare": "husky install"
   },
   "eslintConfig": {
