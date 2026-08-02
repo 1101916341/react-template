@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { AutoComplete, Button, Card, Form, Input, InputNumber, message, Select, Table, Typography } from 'antd'
+import { AutoComplete, Button, Card, Form, Input, InputNumber, message, Select, Table, Tabs, Tag, Typography } from 'antd'
 import { connect } from 'react-redux'
+import DbJsonTable from './dbJsonTable'
 
 const { Title } = Typography
 
@@ -9,17 +10,16 @@ interface DataRow {
   id: number
   drawAt1: string
   drawAt2: string
-  h1: number
-  h2: number
-  h3: number
-  h4: number
-  h5: number
   hGroup: string
-  sum: number
-  quotient: number
-  remainder: number
-  average: number
-  range: number
+  isDuplicate?: boolean
+}
+
+// 保存到 db.json 的 lgz 字段时使用的业务数据结构
+interface SaveRow {
+  Id: number
+  DrawAt1: string
+  DrawAt2: string
+  H6: string
 }
 
 type SortOrder = 'ascend' | 'descend' | null
@@ -68,24 +68,24 @@ function sortRowsByTimeAsc<T extends Pick<DataRow, 'drawAt1' | 'drawAt2' | 'id'>
   })
 }
 
+// 等待指定毫秒数：用于每次接口调用之间的停顿
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 const Parse1 = () => {
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [rows, setRows] = useState<DataRow[]>([])
   const [sortOrder, setSortOrder] = useState<SortOrder>(null)
 
-  // 导出 JSON：H1~H5 逗号分隔、按开奖时间升序存放
+  // 导出 JSON：只包含 Id / DrawAt1 / DrawAt2 / H组合，按开奖时间升序存放
   const downloadJSON = (list: DataRow[]) => {
     const exportData = sortRowsByTimeAsc(list).map((r) => ({
       Id: r.id,
       DrawAt1: r.drawAt1,
       DrawAt2: r.drawAt2,
-      H6: [r.h1, r.h2, r.h3, r.h4, r.h5].join(','),
-      sum: r.sum,
-      quotient: r.quotient,
-      remainder: r.remainder,
-      average: r.average,
-      range: r.range
+      H6: r.hGroup
     }))
 
     const blob = new Blob([JSON.stringify({ data: exportData }, null, 2)], { type: 'application/json' })
@@ -103,6 +103,10 @@ const Parse1 = () => {
     downloadJSON(rows)
   }
 
+  function randomIntSeconds(min = 6, max = 23) {
+    return Math.floor(Math.random() * (max - min + 1)) + min // 包含 10
+  }
+
   const handleSearch = async (values: {
     apiUrl: string
     headerT: string
@@ -118,6 +122,8 @@ const Parse1 = () => {
     setSortOrder(null)
 
     const newRows: DataRow[] = []
+    // 待保存到 db.json 的 lgz 字段（仅成功解析到的数据）
+    const saveData: SaveRow[] = []
 
     try {
       for (let i = 0; i < loopCount; i++) {
@@ -147,31 +153,19 @@ const Parse1 = () => {
           const dataArr = json?.d || []
           for (let j = 0; j < dataArr.length; j++) {
             const item = dataArr[j]
-            const h1 = item.H1
-            const h2 = item.H2
-            const h3 = item.H3
-            const h4 = item.H4
-            const h5 = item.H5
-            const hValues = [h1, h2, h3, h4, h5]
-            const sum = h1 + h2 + h3 + h4 + h5
-            const max = Math.max(...hValues)
-            const min = Math.min(...hValues)
             newRows.push({
               key: `${i + 1}-${j + 1}`,
               id: item.Id,
               drawAt1: item.DrawAt1,
               drawAt2: item.DrawAt2,
-              h1,
-              h2,
-              h3,
-              h4,
-              h5,
-              hGroup: [h1, h2, h3, h4, h5].join(', '),
-              sum,
-              quotient: Math.floor(sum / 5),
-              remainder: sum % 5,
-              average: +(sum / 5).toFixed(2),
-              range: max - min
+              hGroup: [item.H1, item.H2, item.H3, item.H4, item.H5].join(', '),
+              isDuplicate: false
+            })
+            saveData.push({
+              Id: item.Id,
+              DrawAt1: item.DrawAt1,
+              DrawAt2: item.DrawAt2,
+              H6: [item.H1, item.H2, item.H3, item.H4, item.H5].join(', ')
             })
           }
           console.log(`请求 #${i + 1} 响应`, json)
@@ -181,19 +175,14 @@ const Parse1 = () => {
             id: id,
             drawAt1: '',
             drawAt2: '',
-            h1: 0,
-            h2: 0,
-            h3: 0,
-            h4: 0,
-            h5: 0,
-            hGroup: '0, 0, 0, 0, 0',
-            sum: 0,
-            quotient: 0,
-            remainder: 0,
-            average: 0,
-            range: 0
+            hGroup: '0, 0, 0, 0, 0'
           })
           console.error(`请求 #${i + 1} 异常`, error)
+        }
+
+        // 每次只调用一个接口，调用完成后停顿 2 秒再继续下一次调用
+        if (i < loopCount - 1) {
+          await sleep(randomIntSeconds() * 1000)
         }
       }
     } finally {
@@ -203,11 +192,81 @@ const Parse1 = () => {
       setRows(sortedRows)
       setLoading(false)
 
-      // 获取接口数据后：H1~H5 逗号分隔、按时间升序存放到 JSON 文件
       if (sortedRows.length > 0) {
-        message.success({ content: `已获取 ${sortedRows.length} 条数据，正在按开奖时间升序导出 JSON` })
-        downloadJSON(sortedRows)
+        message.success({ content: `已获取 ${sortedRows.length} 条数据` })
       }
+
+      // 保存到 db.json 的 lgz 字段（批量处理：1 次读取对比 + 1 次批量写入）
+      if (saveData.length > 0) {
+        await saveToLgz(saveData)
+      }
+    }
+  }
+
+  // 批量保存到 db.json 的 lgz 字段：
+  //   1. 存入前先去重：一次性获取 lgz 全部数据，在前端按 Id 对比去重（同时标注表格中的重复项）
+  //   2. 只发送去重后的一维数组，单次接口调用批量写入；
+  //      服务端完成「增量合并（保留原有数据）→ 按 Id 升序 → 原子写回 db.json 的 lgz 一维数组」
+  const saveToLgz = async (saveData: SaveRow[]) => {
+    let existingList: any[] = []
+    try {
+      const getResp = await fetch('/api/lgz')
+      const existing = await getResp.json()
+      existingList = Array.isArray(existing) ? existing : []
+    } catch (error) {
+      // 读取失败不阻断保存：后端会基于 db.json 当前数据再次去重
+      console.warn('读取 lgz 已有数据失败，将按全部新增处理', error)
+    }
+
+    // 去掉 json-server 自动生成的 id，仅用业务字段 Id 做对比去重
+    const existingIds = new Set<number>(
+      existingList.map((item: any) => Number(item?.Id)).filter((n: number) => Number.isFinite(n) && n > 0)
+    )
+
+    // 对比去重：existingIds 中已存在的记为重复，其余为本次新增
+    const toAdd: SaveRow[] = []
+    const dupIds = new Set<number>()
+    const seen = new Set<number>(existingIds)
+    for (const item of saveData) {
+      if (seen.has(item.Id)) {
+        dupIds.add(item.Id)
+      } else {
+        seen.add(item.Id)
+        toAdd.push(item)
+      }
+    }
+
+    // 更新表格状态列（新增 / 重复）
+    setRows((prev) => prev.map((r) => ({ ...r, isDuplicate: dupIds.has(r.id) })))
+
+    if (toAdd.length === 0) {
+      message.success({
+        content: `数据已存在于 lgz 中，无新增（重复跳过 ${saveData.length} 条，库中共 ${existingIds.size} 条）`
+      })
+      return
+    }
+
+    try {
+      // 存入前已完成去重；发送时按 Id 升序排列、保持一维数组；
+      // 服务端完成 增量合并（保留原有 lgz 数据）→ 再次去重 → 按 Id 升序 → 原子写回 db.json
+      const sortedToAdd = [...toAdd].sort((a, b) => a.Id - b.Id)
+      const saveResp = await fetch('/api/lgz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sortedToAdd)
+      })
+      const result = await saveResp.json()
+
+      if (result.success) {
+        message.success({
+          content: `已保存到 lgz，库中共 ${result.total} 条（本次新增 ${result.added} 条，重复跳过 ${result.skipped} 条，按 Id 升序）`
+        })
+      } else {
+        message.error({ content: result.message || '保存到 lgz 失败' })
+      }
+    } catch (error) {
+      console.error('保存到 lgz 失败', error)
+      message.error({ content: '保存到 lgz 失败' })
     }
   }
 
@@ -235,56 +294,11 @@ const Parse1 = () => {
       // 按 Id 升序排列
       const sortedRows = [...rows].sort((a, b) => a.id - b.id)
 
-      const header = [
-        'Id',
-        'DrawAt1',
-        'DrawAt2',
-        'H1',
-        'H2',
-        'H3',
-        'H4',
-        'H5',
-        'H组合',
-        '和值',
-        '商值',
-        '余值',
-        '平均值',
-        '跨度'
-      ]
-      const data = sortedRows.map((r) => [
-        r.id,
-        r.drawAt1,
-        r.drawAt2,
-        r.h1,
-        r.h2,
-        r.h3,
-        r.h4,
-        r.h5,
-        r.hGroup,
-        r.sum,
-        r.quotient,
-        r.remainder,
-        r.average,
-        r.range
-      ])
+      const header = ['Id', 'DrawAt1', 'DrawAt2', 'H组合']
+      const data = sortedRows.map((r) => [r.id, r.drawAt1, r.drawAt2, r.hGroup])
 
       const ws = XLSX.utils.aoa_to_sheet([header, ...data])
-      ws['!cols'] = [
-        { wch: 10 },
-        { wch: 14 },
-        { wch: 10 },
-        { wch: 8 },
-        { wch: 8 },
-        { wch: 8 },
-        { wch: 8 },
-        { wch: 8 },
-        { wch: 22 },
-        { wch: 8 },
-        { wch: 8 },
-        { wch: 8 },
-        { wch: 10 },
-        { wch: 8 }
-      ]
+      ws['!cols'] = [{ wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 22 }]
 
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, 'Racing')
@@ -306,6 +320,16 @@ const Parse1 = () => {
       width: 100
     },
     {
+      title: '状态',
+      dataIndex: 'isDuplicate',
+      key: 'isDuplicate',
+      width: 90,
+      render: (isDuplicate: boolean | undefined) => {
+        if (isDuplicate === undefined) return null
+        return isDuplicate ? <Tag color='orange'>重复</Tag> : <Tag color='green'>新增</Tag>
+      }
+    },
+    {
       title: 'DrawAt1',
       dataIndex: 'drawAt1',
       key: 'drawAt1',
@@ -320,137 +344,93 @@ const Parse1 = () => {
       width: 100
     },
     {
-      title: 'H1',
-      dataIndex: 'h1',
-      key: 'h1',
-      width: 80
-    },
-    {
-      title: 'H2',
-      dataIndex: 'h2',
-      key: 'h2',
-      width: 80
-    },
-    {
-      title: 'H3',
-      dataIndex: 'h3',
-      key: 'h3',
-      width: 80
-    },
-    {
-      title: 'H4',
-      dataIndex: 'h4',
-      key: 'h4',
-      width: 80
-    },
-    {
-      title: 'H5',
-      dataIndex: 'h5',
-      key: 'h5',
-      width: 80
-    },
-    {
       title: 'H组合',
       dataIndex: 'hGroup',
       key: 'hGroup',
       width: 180
-    },
-    {
-      title: '和值',
-      dataIndex: 'sum',
-      key: 'sum',
-      width: 80
-    },
-    {
-      title: '商值',
-      dataIndex: 'quotient',
-      key: 'quotient',
-      width: 80
-    },
-    {
-      title: '余值',
-      dataIndex: 'remainder',
-      key: 'remainder',
-      width: 80
-    },
-    {
-      title: '平均值',
-      dataIndex: 'average',
-      key: 'average',
-      width: 90
-    },
-    {
-      title: '跨度',
-      dataIndex: 'range',
-      key: 'range',
-      width: 80
     }
   ]
 
   return (
-    <Card className='card'>
-      <Title level={4}>数据解析 - 接口循环调用</Title>
-      <Form
-        form={form}
-        style={{ marginBottom: 24 }}
-        onFinish={handleSearch}
-        initialValues={{ idMode: 'increment', loopCount: 1, initId: 1 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0 24px' }}>
-          <Form.Item label='接口地址' name='apiUrl' rules={[{ required: true, message: '请选择或输入接口地址' }]}>
-            <AutoComplete
-              placeholder='请选择或输入 http/https 请求地址'
-              options={[{ value: '/Ha1/GetLastResults' }, { value: '/Ha1/GetLastResults?page=1' }]}
-              filterOption={(inputValue, option) =>
-                option ? option.value.toUpperCase().includes(inputValue.toUpperCase()) : false
-              }
-            />
-          </Form.Item>
-          <Form.Item label='请求头 _t_' name='headerT' rules={[{ required: true, message: '请输入 _t_ 字段值' }]}>
-            <Input placeholder='headers 的 _t_ 字段值' />
-          </Form.Item>
-          <Form.Item label='Cookie' name='headerCookie' rules={[{ required: true, message: '请输入 Cookie' }]}>
-            <Input placeholder='请求 headers 的 Cookie 字段值' />
-          </Form.Item>
-          <Form.Item label='初始 ID' name='initId' rules={[{ required: true, message: '请输入初始 ID 值' }]}>
-            <InputNumber placeholder='body 中 ID 的初始值' min={0} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item label='ID 模式' name='idMode' rules={[{ required: true, message: '请选择 ID 变化模式' }]}>
-            <Select style={{ width: '100%' }}>
-              <Select.Option value='increment'>递增</Select.Option>
-              <Select.Option value='decrement'>递减</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label='循环次数' name='loopCount' rules={[{ required: true, message: '请输入循环调用次数' }]}>
-            <InputNumber placeholder='调用接口的次数' min={1} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item label=' ' colon={false}>
-            <Button type='primary' htmlType='submit' loading={loading} style={{ width: '100%' }}>
-              开始调用
-            </Button>
-          </Form.Item>
-        </div>
-      </Form>
+    <Tabs
+      defaultActiveKey='parse'
+      items={[
+        {
+          key: 'parse',
+          label: '接口循环调用',
+          children: (
+            <Card className='card'>
+              <Title level={4}>数据解析 - 接口循环调用</Title>
+              <Form
+                form={form}
+                style={{ marginBottom: 24 }}
+                onFinish={handleSearch}
+                initialValues={{ idMode: 'increment', loopCount: 1, initId: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0 24px' }}>
+                  <Form.Item label='接口地址' name='apiUrl' rules={[{ required: true, message: '请选择或输入接口地址' }]}>
+                    <AutoComplete
+                      placeholder='请选择或输入 http/https 请求地址'
+                      options={[{ value: '/Ha1/GetLastResults' }, { value: '/Ha1/GetLastResults?page=1' }]}
+                      filterOption={(inputValue, option) =>
+                        option ? option.value.toUpperCase().includes(inputValue.toUpperCase()) : false
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item label='请求头 _t_' name='headerT' rules={[{ required: true, message: '请输入 _t_ 字段值' }]}>
+                    <Input placeholder='headers 的 _t_ 字段值' />
+                  </Form.Item>
+                  <Form.Item label='Cookie' name='headerCookie' rules={[{ required: true, message: '请输入 Cookie' }]}>
+                    <Input placeholder='请求 headers 的 Cookie 字段值' />
+                  </Form.Item>
+                  <Form.Item label='初始 ID' name='initId' rules={[{ required: true, message: '请输入初始 ID 值' }]}>
+                    <InputNumber placeholder='body 中 ID 的初始值' min={0} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label='ID 模式' name='idMode' rules={[{ required: true, message: '请选择 ID 变化模式' }]}>
+                    <Select style={{ width: '100%' }}>
+                      <Select.Option value='increment'>递增</Select.Option>
+                      <Select.Option value='decrement'>递减</Select.Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label='循环次数' name='loopCount' rules={[{ required: true, message: '请输入循环调用次数' }]}>
+                    <InputNumber placeholder='调用接口的次数' min={1} style={{ width: '100%' }} />
+                  </Form.Item>
+                  <Form.Item label=' ' colon={false}>
+                    <Button type='primary' htmlType='submit' loading={loading} style={{ width: '100%' }}>
+                      开始调用
+                    </Button>
+                  </Form.Item>
+                </div>
+              </Form>
 
-      <div style={{ textAlign: 'right', marginBottom: 12 }}>
-        <Button type='default' disabled={rows.length === 0} onClick={handleExportJSON} style={{ marginRight: 8 }}>
-          导出 JSON
-        </Button>
-        <Button type='primary' disabled={rows.length === 0} onClick={handleExportXLSX}>
-          导出 Excel
-        </Button>
-      </div>
+              <div style={{ textAlign: 'right', marginBottom: 12 }}>
+                <Button type='default' disabled={rows.length === 0} onClick={handleExportJSON} style={{ marginRight: 8 }}>
+                  导出 JSON
+                </Button>
+                <Button type='primary' disabled={rows.length === 0} onClick={handleExportXLSX}>
+                  导出 Excel
+                </Button>
+              </div>
 
-      <Table
-        rowKey='key'
-        columns={columns}
-        dataSource={rows}
-        pagination={false}
-        scroll={{ x: 1300 }}
-        onChange={(pagination, filters, sorter) => {
-          handleSortChange()
-        }}
-      />
-    </Card>
+              <Table
+                rowKey='key'
+                columns={columns}
+                dataSource={rows}
+                pagination={false}
+                scroll={{ x: 500 }}
+                onChange={(pagination, filters, sorter) => {
+                  handleSortChange()
+                }}
+              />
+            </Card>
+          )
+        },
+        {
+          key: 'dbJson',
+          label: 'db.json 数据（lgz）',
+          children: <DbJsonTable />
+        }
+      ]}
+    />
   )
 }
 
@@ -461,5 +441,3 @@ function mapStateToProps(state: any) {
 }
 
 export default connect(mapStateToProps, {})(Parse1)
-
-

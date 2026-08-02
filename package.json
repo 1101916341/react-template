@@ -36,7 +36,7 @@
     "build": "craco --max_old_space_size=8192 build --progress",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "json-server": "json-server __json_server_mock__/db.json --watch",
+    "json-server": "json-server __json_server_mock__/db.json --port 3301",
     "sample:gen": "ts-node --project tsconfig.scripts.json scripts/generateSampleData.ts",
     "prepare": "husky install"
   },

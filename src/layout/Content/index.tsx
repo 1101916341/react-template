@@ -11,7 +11,6 @@ import { getKeyName, isAuthorized } from '@/utils'
 import { tagAddFnc, tagDelFnc, tagUpdateFnc } from '@store/tags/tagsAction'
 
 const { Content } = Layout
-const { TabPane } = Tabs
 
 const LayoutContent = React.memo((props: any) => {
   const { defaultActiveKey, panesItem, tabActiveKey, tagAddFnc, tagDelFnc, tagUpdateFnc, menuPane } = props
@@ -143,25 +142,23 @@ const LayoutContent = React.memo((props: any) => {
           activeKey={activeKey}
           onChange={onChange}
           hideAdd
-          type='editable-card'>
-          {menuPane.map((pane: any) => (
-            <TabPane
-              tab={
-                <Dropdown overlay={menu} trigger={['contextMenu']}>
-                  <span onContextMenu={(e) => handlePreventDefault(e, pane)}>
-                    {isReload && pane.path === fullPath && pane.path !== '/403' && (
-                      <SyncOutlined title='刷新' spin={isReload} />
-                    )}
-                    {pane.title}
-                  </span>
-                </Dropdown>
-              }
-              closable={pane.closable}
-              key={pane.key}>
-              {pane.path ? <pane.content path={pane.path} /> : <Loading />}
-            </TabPane>
-          ))}
-        </Tabs>
+          type='editable-card'
+          items={menuPane.map((pane: any) => ({
+            key: pane.key,
+            closable: pane.closable,
+            label: (
+              <Dropdown overlay={menu} trigger={['contextMenu']}>
+                <span onContextMenu={(e) => handlePreventDefault(e, pane)}>
+                  {isReload && pane.path === fullPath && pane.path !== '/403' && (
+                    <SyncOutlined title='刷新' spin={isReload} />
+                  )}
+                  {pane.title}
+                </span>
+              </Dropdown>
+            ),
+            children: pane.path ? <pane.content path={pane.path} /> : <Loading />
+          }))}
+        />
       </Content>
     </DocumentTitle>
   )
