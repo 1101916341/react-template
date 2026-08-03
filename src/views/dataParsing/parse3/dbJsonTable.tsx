@@ -60,7 +60,9 @@ function matchRow(row: DbRow, key: keyof DbRow, keyword: string): boolean {
     const value = String(row[key] ?? '')
     return value >= keyword
   }
-  return String(row[key] ?? '').toLowerCase().includes(keyword.toLowerCase())
+  return String(row[key] ?? '')
+    .toLowerCase()
+    .includes(keyword.toLowerCase())
 }
 
 const DbJsonTable = () => {
@@ -212,7 +214,7 @@ const DbJsonTable = () => {
   const activeIdKeyword = normalizeKeyword('Id', filters.Id || '')
 
   return (
-    <Card title='db.json 数据（lgz）'>
+    <Card title='db数据列表' className='card'>
       <Space style={{ marginBottom: 16 }} wrap>
         {SEARCH_FIELDS.map(({ key, label, placeholder, width }) => (
           <Input.Search
@@ -247,7 +249,7 @@ const DbJsonTable = () => {
       </div>
 
       <Table
-        rowKey={(record) => String(record.Id)}
+        rowKey={() => Math.random()}
         size='middle'
         columns={columns}
         dataSource={filteredRows}
@@ -258,7 +260,6 @@ const DbJsonTable = () => {
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 条`
         }}
-        scroll={{ x: 700 }}
       />
     </Card>
   )

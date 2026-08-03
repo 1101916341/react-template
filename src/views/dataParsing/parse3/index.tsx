@@ -1,5 +1,18 @@
 import React, { useState } from 'react'
-import { AutoComplete, Button, Card, Form, Input, InputNumber, message, Select, Table, Tabs, Tag, Typography } from 'antd'
+import {
+  AutoComplete,
+  Button,
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Select,
+  Table,
+  Tabs,
+  Tag,
+  Typography
+} from 'antd'
 import { connect } from 'react-redux'
 import DbJsonTable from './dbJsonTable'
 
@@ -367,7 +380,10 @@ const Parse1 = () => {
                 onFinish={handleSearch}
                 initialValues={{ idMode: 'increment', loopCount: 1, initId: 1 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0 24px' }}>
-                  <Form.Item label='接口地址' name='apiUrl' rules={[{ required: true, message: '请选择或输入接口地址' }]}>
+                  <Form.Item
+                    label='接口地址'
+                    name='apiUrl'
+                    rules={[{ required: true, message: '请选择或输入接口地址' }]}>
                     <AutoComplete
                       placeholder='请选择或输入 http/https 请求地址'
                       options={[{ value: '/Ha1/GetLastResults' }, { value: '/Ha1/GetLastResults?page=1' }]}
@@ -376,7 +392,10 @@ const Parse1 = () => {
                       }
                     />
                   </Form.Item>
-                  <Form.Item label='请求头 _t_' name='headerT' rules={[{ required: true, message: '请输入 _t_ 字段值' }]}>
+                  <Form.Item
+                    label='请求头 _t_'
+                    name='headerT'
+                    rules={[{ required: true, message: '请输入 _t_ 字段值' }]}>
                     <Input placeholder='headers 的 _t_ 字段值' />
                   </Form.Item>
                   <Form.Item label='Cookie' name='headerCookie' rules={[{ required: true, message: '请输入 Cookie' }]}>
@@ -391,7 +410,10 @@ const Parse1 = () => {
                       <Select.Option value='decrement'>递减</Select.Option>
                     </Select>
                   </Form.Item>
-                  <Form.Item label='循环次数' name='loopCount' rules={[{ required: true, message: '请输入循环调用次数' }]}>
+                  <Form.Item
+                    label='循环次数'
+                    name='loopCount'
+                    rules={[{ required: true, message: '请输入循环调用次数' }]}>
                     <InputNumber placeholder='调用接口的次数' min={1} style={{ width: '100%' }} />
                   </Form.Item>
                   <Form.Item label=' ' colon={false}>
@@ -401,22 +423,23 @@ const Parse1 = () => {
                   </Form.Item>
                 </div>
               </Form>
-
               <div style={{ textAlign: 'right', marginBottom: 12 }}>
-                <Button type='default' disabled={rows.length === 0} onClick={handleExportJSON} style={{ marginRight: 8 }}>
+                <Button
+                  type='default'
+                  disabled={rows.length === 0}
+                  onClick={handleExportJSON}
+                  style={{ marginRight: 8 }}>
                   导出 JSON
                 </Button>
                 <Button type='primary' disabled={rows.length === 0} onClick={handleExportXLSX}>
                   导出 Excel
                 </Button>
               </div>
-
               <Table
-                rowKey='key'
+                rowKey={() => Math.random()}
                 columns={columns}
                 dataSource={rows}
                 pagination={false}
-                scroll={{ x: 500 }}
                 onChange={(pagination, filters, sorter) => {
                   handleSortChange()
                 }}
@@ -426,7 +449,7 @@ const Parse1 = () => {
         },
         {
           key: 'dbJson',
-          label: 'db.json 数据（lgz）',
+          label: 'db数据列表',
           children: <DbJsonTable />
         }
       ]}
