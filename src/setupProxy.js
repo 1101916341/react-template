@@ -202,6 +202,16 @@ module.exports = function (app) {
   )
 
   app.use(
+    '/openaward',
+    createProxyMiddleware({
+      target: 'https://154.19.226.219',
+      changeOrigin: true,
+      secure:false
+    })
+  )
+
+
+  app.use(
     '/Ha1',
     createProxyMiddleware({
       target: 'https://lgz618618.com',

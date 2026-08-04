@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   AutoComplete,
   Button,
@@ -15,6 +15,7 @@ import {
 } from 'antd'
 import { connect } from 'react-redux'
 import DbJsonTable from './dbJsonTable'
+import { ungzip } from 'pako'
 
 const { Title } = Typography
 
@@ -386,7 +387,7 @@ const Parse1 = () => {
                     rules={[{ required: true, message: '请选择或输入接口地址' }]}>
                     <AutoComplete
                       placeholder='请选择或输入 http/https 请求地址'
-                      options={[{ value: '/Ha1/GetLastResults' }, { value: '/Ha1/GetLastResults?page=1' }]}
+                      options={[{ value: '/Ha1/GetLastResults' }]}
                       filterOption={(inputValue, option) =>
                         option ? option.value.toUpperCase().includes(inputValue.toUpperCase()) : false
                       }

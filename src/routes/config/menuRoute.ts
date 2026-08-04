@@ -22,6 +22,10 @@ const DataParse3Menu = lazy(
   () => import('@views/dataParsing/parse3')
   // 数据解析 - 解析3
 )
+const DataParse4Menu = lazy(
+  () => import('@views/dataParsing/parse4')
+  // 数据解析 - 解析4
+)
 
 export const menuRoute = [
   {
@@ -76,6 +80,13 @@ export const menuRoute = [
         name: '解析3',
         key: 'data:parse3:view',
         component: DataParse3Menu,
+        isShow: true
+      },
+      {
+        path: '/data/parse4',
+        name: '解析4',
+        key: 'data:parse4:view',
+        component: DataParse4Menu,
         isShow: true
       }
     ]
